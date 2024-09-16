@@ -61,3 +61,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadMessages();
 });
+
+function pollMessages() {
+    fetch('chat.php')
+        .then(response => response.json())
+        .then(messages => {
+            messageArea.innerHTML = '';
+            messages.forEach(msg => {
+                appendMessage(msg, 'incoming');
+            });
+            scrollToBottom();
+        })
+        .finally(() => {
+            setTimeout(pollMessages, 2000); // Poll every 2 seconds
+        });
+}
+
+// Start polling
+pollMessages();
+
