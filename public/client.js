@@ -1,57 +1,54 @@
-const socket = io();
+const socket = io()
 let name;
-let textarea = document.querySelector('#textarea');
-let messageArea = document.querySelector('.message__area');
-
+let textarea = document.querySelector('#textarea')
+let messageArea = document.querySelector('.message__area')
 do {
-    name = prompt('Por favor, digite seu nome: ');
-} while (!name);
+    name = prompt('Por favor, digite seu nome: ')
+} while(!name)
 
 textarea.addEventListener('keyup', (e) => {
-    if (e.key === 'Enter') {
-        sendMessage(e.target.value);
+    if(e.key === 'Enter') {
+        sendMessage(e.target.value)
     }
-});
+})
 
 function sendMessage(message) {
     let msg = {
         user: name,
         message: message.trim()
-    };
+    }
     // Append 
-    appendMessage(msg, 'outgoing');
-    textarea.value = '';
-    scrollToBottom();
+    appendMessage(msg, 'outgoing')
+    textarea.value = ''
+    scrollToBottom()
 
     // Send to server 
-    socket.emit('message', msg);
+    socket.emit('message', msg)
+
 }
 
 function appendMessage(msg, type) {
-    let mainDiv = document.createElement('div');
-    let className = type;
-    mainDiv.classList.add(className, 'message');
+    let mainDiv = document.createElement('div')
+    let className = type
+    mainDiv.classList.add(className, 'message')
 
     let markup = `
         <h4>${msg.user}</h4>
         <p>${msg.message}</p>
-    `;
-    mainDiv.innerHTML = markup;
-    messageArea.appendChild(mainDiv);
+    `
+    mainDiv.innerHTML = markup
+    messageArea.appendChild(mainDiv)
 }
 
-// Receive messages 
+// Recieve messages 
 socket.on('message', (msg) => {
-    appendMessage(msg, 'incoming');
-    scrollToBottom();
-});
-
-// Load previous messages
-socket.on('previousMessages', (messages) => {
-    messages.forEach(msg => appendMessage(msg, 'incoming'));
-    scrollToBottom();
-});
+    appendMessage(msg, 'incoming')
+    scrollToBottom()
+})
 
 function scrollToBottom() {
-    messageArea.scrollTop = messageArea.scrollHeight;
+    messageArea.scrollTop = messageArea.scrollHeight
 }
+
+
+
