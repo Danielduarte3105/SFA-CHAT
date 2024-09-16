@@ -10,47 +10,17 @@
 
 <body>
     <section class="chat__section">
-        <!-- Menu Hambúrguer para exibir a lista de usuários -->
-        <div class="sidebar">
-            <button class="hamburger">☰</button>
-            <div class="user-list" style="display: none;">
-                <h2>Usuários conectados</h2>
-                <ul></ul>
-            </div>
-        </div>
-
-        <!-- Marca e cabeçalho -->
         <div class="brand">
             <img height="40" src="/chat.png" alt="">
             <h1>SFA - PORTAL</h1>
         </div>
-
-        <!-- Área de mensagens -->
         <div class="message__area"></div>
-
-        <!-- Input de mensagem -->
         <div>
             <textarea id="textarea" cols="30" rows="1" placeholder="Escreva sua mensagem..."></textarea>
         </div>
     </section>
-
-    <!-- Sockets e Client-side JS -->
     <script src="/socket.io/socket.io.js"></script>
     <script src="/client.js"></script>
-
-    <script>
-        // Código para controlar o menu hambúrguer e exibir a lista de usuários
-        const hamburgerButton = document.querySelector('.hamburger');
-        const userList = document.querySelector('.user-list');
-        
-        hamburgerButton.addEventListener('click', () => {
-            if (userList.style.display === 'none') {
-                userList.style.display = 'block';
-            } else {
-                userList.style.display = 'none';
-            }
-        });
-    </script>
 </body>
 
 </html>
