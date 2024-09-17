@@ -1,7 +1,7 @@
-const socket = io()
+const socket = io();
 let name;
-let textarea = document.querySelector('#textarea')
-let messageArea = document.querySelector('.message__area')
+let textarea = document.querySelector('#textarea');
+let messageArea = document.querySelector('.message__area');
 
 // Função para carregar usuários do JSON
 async function loadUsers() {
@@ -20,60 +20,61 @@ async function checkUser(username) {
     return users.some(user => user.username === username);
 }
 
+// Função principal para obter o nome de usuário
 async function getUserName() {
     let username;
-    do {
+    while (true) {
         username = prompt('Por favor, digite seu nome de usuário: ');
-    } while (!username || !(await checkUser(username)));
-    
-    if (!(await checkUser(username))) {
-        window.location.href = 'user.html';
-    } else {
-        name = username;
+        if (username && await checkUser(username)) {
+            name = username;
+            break;
+        } else {
+            window.location.href = 'user.html';
+        }
     }
 }
 
-getUserName();
+getUserName().then(() => {
+    textarea.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') {
+            sendMessage(e.target.value);
+        }
+    });
 
-textarea.addEventListener('keyup', (e) => {
-    if (e.key === 'Enter') {
-        sendMessage(e.target.value)
+    function sendMessage(message) {
+        let msg = {
+            user: name,
+            message: message.trim()
+        };
+        // Append 
+        appendMessage(msg, 'outgoing');
+        textarea.value = '';
+        scrollToBottom();
+
+        // Send to server 
+        socket.emit('message', msg);
     }
-})
 
-function sendMessage(message) {
-    let msg = {
-        user: name,
-        message: message.trim()
+    function appendMessage(msg, type) {
+        let mainDiv = document.createElement('div');
+        let className = type;
+        mainDiv.classList.add(className, 'message');
+
+        let markup = `
+            <h4>${msg.user}</h4>
+            <p>${msg.message}</p>
+        `;
+        mainDiv.innerHTML = markup;
+        messageArea.appendChild(mainDiv);
     }
-    // Append 
-    appendMessage(msg, 'outgoing')
-    textarea.value = ''
-    scrollToBottom()
 
-    // Send to server 
-    socket.emit('message', msg)
-}
+    // Receive messages 
+    socket.on('message', (msg) => {
+        appendMessage(msg, 'incoming');
+        scrollToBottom();
+    });
 
-function appendMessage(msg, type) {
-    let mainDiv = document.createElement('div')
-    let className = type
-    mainDiv.classList.add(className, 'message')
-
-    let markup = `
-        <h4>${msg.user}</h4>
-        <p>${msg.message}</p>
-    `
-    mainDiv.innerHTML = markup
-    messageArea.appendChild(mainDiv)
-}
-
-// Receive messages 
-socket.on('message', (msg) => {
-    appendMessage(msg, 'incoming')
-    scrollToBottom()
-})
-
-function scrollToBottom() {
-    messageArea.scrollTop = messageArea.scrollHeight
-}
+    function scrollToBottom() {
+        messageArea.scrollTop = messageArea.scrollHeight;
+    }
+});
