@@ -99,3 +99,20 @@ function appendMessage(msg, type) {
 function scrollToBottom() {
     messageArea.scrollTop = messageArea.scrollHeight;
 }
+
+document.getElementById('uploadFileBtn').addEventListener('click', () => {
+    document.getElementById('fileInput').click(); // Abre o seletor de arquivos
+});
+
+document.getElementById('fileInput').addEventListener('change', (event) => {
+    const file = event.target.files[0]; // Captura o arquivo selecionado
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            // Enviar o arquivo para o servidor ou processá-lo
+            console.log('Arquivo carregado:', file.name);
+            // Aqui você pode enviar o arquivo via Socket.io ou outro método
+        };
+        reader.readAsDataURL(file);
+    }
+});
