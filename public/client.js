@@ -85,9 +85,17 @@ function scrollToBottom() {
     messageArea.scrollTop = messageArea.scrollHeight;
 }
 
-// Limpa o histórico de uma sala quando solicitado
-socket.on('clearHistory', (room) => {
-    clearMessageHistory(room);
-    io.to(room).emit('historyCleared'); // Informa os clientes que o histórico foi limpo
+document.getElementById('clearHistoryBtn').addEventListener('click', () => {
+    if (room) {
+        socket.emit('clearHistory', room); // Solicita ao servidor para limpar o histórico da sala atual
+    } else {
+        alert('Por favor, selecione uma sala antes de limpar o histórico.');
+    }
+});
+
+// Recebe a notificação de que o histórico foi limpo
+socket.on('historyCleared', () => {
+    messageArea.innerHTML = ''; // Limpa a área de mensagens na interface
+    alert('O histórico foi limpo.');
 });
 
