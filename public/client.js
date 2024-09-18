@@ -1,10 +1,16 @@
 const socket = io()
 let name;
+let room; // A sala que o usuário irá se conectar
 let textarea = document.querySelector('#textarea')
 let messageArea = document.querySelector('.message__area')
+
+// Pergunta o nome do usuário e cria uma sala baseada no nome
 do {
     name = prompt('Por favor, digite seu nome: ')
 } while(!name)
+
+room = name; // Usa o nome como identificador de sala
+socket.emit('joinRoom', room); // Solicita ao servidor para adicionar o usuário à sala
 
 textarea.addEventListener('keyup', (e) => {
     if(e.key === 'Enter') {
@@ -15,16 +21,16 @@ textarea.addEventListener('keyup', (e) => {
 function sendMessage(message) {
     let msg = {
         user: name,
-        message: message.trim()
+        message: message.trim(),
+        room: room // Adiciona a sala à mensagem
     }
-    // Append 
+    // Adiciona a mensagem na área de saída
     appendMessage(msg, 'outgoing')
     textarea.value = ''
     scrollToBottom()
 
-    // Send to server 
+    // Envia ao servidor
     socket.emit('message', msg)
-
 }
 
 function appendMessage(msg, type) {
@@ -40,7 +46,7 @@ function appendMessage(msg, type) {
     messageArea.appendChild(mainDiv)
 }
 
-// Recieve messages 
+// Recebe as mensagens da sala
 socket.on('message', (msg) => {
     appendMessage(msg, 'incoming')
     scrollToBottom()
