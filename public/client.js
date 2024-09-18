@@ -1,10 +1,29 @@
 const socket = io()
 let name;
+let room; // Variável para armazenar a sala atual
 let textarea = document.querySelector('#textarea')
 let messageArea = document.querySelector('.message__area')
+let userList = document.querySelectorAll('.list-friends li');
+
+// Pergunta o nome do usuário ao entrar
 do {
     name = prompt('Por favor, digite seu nome: ')
 } while(!name)
+
+// Adiciona evento de clique para cada usuário na lista
+userList.forEach(user => {
+    user.addEventListener('click', () => {
+        let selectedUser = user.querySelector('.user').textContent.trim();
+        room = selectedUser; // Define a sala como o nome do usuário clicado
+
+        // Entra na sala correspondente
+        socket.emit('joinRoom', room);
+        
+        // Limpa a área de mensagens
+        messageArea.innerHTML = '';
+        console.log(`Você entrou na sala de ${room}`);
+    });
+});
 
 textarea.addEventListener('keyup', (e) => {
     if(e.key === 'Enter') {
@@ -13,18 +32,23 @@ textarea.addEventListener('keyup', (e) => {
 })
 
 function sendMessage(message) {
-    let msg = {
-        user: name,
-        message: message.trim()
+    if (room) {
+        let msg = {
+            user: name,
+            message: message.trim(),
+            room: room // Adiciona a sala à mensagem
+        }
+
+        // Adiciona a mensagem na área de saída
+        appendMessage(msg, 'outgoing')
+        textarea.value = ''
+        scrollToBottom()
+
+        // Envia ao servidor
+        socket.emit('message', msg)
+    } else {
+        alert('Por favor, selecione um usuário para conversar.');
     }
-    // Append 
-    appendMessage(msg, 'outgoing')
-    textarea.value = ''
-    scrollToBottom()
-
-    // Send to server 
-    socket.emit('message', msg)
-
 }
 
 function appendMessage(msg, type) {
@@ -40,10 +64,12 @@ function appendMessage(msg, type) {
     messageArea.appendChild(mainDiv)
 }
 
-// Recieve messages 
+// Recebe as mensagens da sala atual
 socket.on('message', (msg) => {
-    appendMessage(msg, 'incoming')
-    scrollToBottom()
+    if (msg.room === room) {
+        appendMessage(msg, 'incoming');
+    }
+    scrollToBottom();
 })
 
 function scrollToBottom() {
