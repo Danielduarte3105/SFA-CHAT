@@ -33,6 +33,12 @@ function saveMessageHistory(room, messages) {
     fs.writeFileSync(`./history_${room}.json`, JSON.stringify(messages, null, 2));
 }
 
+// Função para limpar o histórico de mensagens de uma sala
+function clearMessageHistory(room) {
+    fs.writeFileSync(`./history_${room}.json`, JSON.stringify([], null, 2)); // Sobrescreve com um array vazio
+    console.log(`O histórico da sala ${room} foi limpo.`);
+}
+
 io.on('connection', (socket) => {
     console.log('Connected...');
 
@@ -55,5 +61,11 @@ io.on('connection', (socket) => {
 
         // Envia a mensagem para todos na sala
         io.to(room).emit('message', msg);
+    });
+
+    // Limpa o histórico de uma sala quando solicitado
+    socket.on('clearHistory', (room) => {
+        clearMessageHistory(room);
+        io.to(room).emit('historyCleared'); // Informa os clientes que o histórico foi limpo
     });
 });
