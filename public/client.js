@@ -13,7 +13,7 @@ do {
 // Adiciona evento de clique para cada usuário na lista
 userList.forEach(user => {
     user.addEventListener('click', () => {
-        let selectedUser = user.querySelector('.user').textContent.trim();
+        let selectedUser = user.getAttribute('data-user');
         room = selectedUser; // Define a sala como o nome do usuário clicado
 
         // Entra na sala correspondente
@@ -39,7 +39,7 @@ function sendMessage(message) {
             room: room // Adiciona a sala à mensagem
         }
 
-        // Adiciona a mensagem na área de saída
+        // Adiciona a mensagem na área de saída como "enviada"
         appendMessage(msg, 'outgoing')
         textarea.value = ''
         scrollToBottom()
@@ -50,6 +50,15 @@ function sendMessage(message) {
         alert('Por favor, selecione um usuário para conversar.');
     }
 }
+
+// Recebe a mensagem e mostra apenas a versão "incoming" (recebida)
+socket.on('message', (msg) => {
+    // Só exibe a mensagem recebida se for de outro usuário
+    if (msg.user !== name && msg.room === room) {
+        appendMessage(msg, 'incoming');
+    }
+    scrollToBottom();
+})
 
 function appendMessage(msg, type) {
     let mainDiv = document.createElement('div')
@@ -63,14 +72,6 @@ function appendMessage(msg, type) {
     mainDiv.innerHTML = markup
     messageArea.appendChild(mainDiv)
 }
-
-// Recebe as mensagens da sala atual
-socket.on('message', (msg) => {
-    if (msg.room === room) {
-        appendMessage(msg, 'incoming');
-    }
-    scrollToBottom();
-})
 
 function scrollToBottom() {
     messageArea.scrollTop = messageArea.scrollHeight
