@@ -68,6 +68,21 @@ socket.on('history', (messages) => {
     scrollToBottom();
 });
 
+// Limpa o histórico da sala quando solicitado
+document.getElementById('clearHistoryBtn').addEventListener('click', () => {
+    if (room) {
+        socket.emit('clearHistory', room); // Solicita ao servidor para limpar o histórico da sala atual
+    } else {
+        alert('Por favor, selecione uma sala antes de limpar o histórico.');
+    }
+});
+
+// Recebe a notificação de que o histórico foi limpo
+socket.on('historyCleared', () => {
+    messageArea.innerHTML = ''; // Limpa a área de mensagens na interface
+    alert('O histórico foi limpo.');
+});
+
 function appendMessage(msg, type) {
     let mainDiv = document.createElement('div');
     let className = type;
