@@ -1,19 +1,19 @@
-const socket = io()
+const socket = io();
 let name;
 let room = null; // Inicializa a variável room como null
-let textarea = document.querySelector('#textarea')
-let messageArea = document.querySelector('.message__area')
+let textarea = document.querySelector('#textarea');
+let messageArea = document.querySelector('.message__area');
 let userList = document.querySelectorAll('.list-friends li');
 
 // Pergunta o nome do usuário ao entrar
 do {
     name = prompt('Por favor, digite seu nome: ')
-} while(!name)
+} while(!name);
 
 // Adiciona evento de clique para cada usuário na lista
 userList.forEach(user => {
     user.addEventListener('click', () => {
-        let selectedUser = user.getAttribute('data-user'); // Captura o valor do atributo data-user
+        let selectedUser = user.getAttribute('data-user');
         if (selectedUser) {
             room = selectedUser; // Define a sala como o nome do usuário clicado
             socket.emit('joinRoom', room); // Envia o nome da sala para o servidor
@@ -27,25 +27,25 @@ userList.forEach(user => {
 
 textarea.addEventListener('keyup', (e) => {
     if(e.key === 'Enter') {
-        sendMessage(e.target.value)
+        sendMessage(e.target.value);
     }
-})
+});
 
 function sendMessage(message) {
     if (room) {
         let msg = {
             user: name,
             message: message.trim(),
-            room: room // Adiciona a sala à mensagem
-        }
+            room: room
+        };
 
         // Adiciona a mensagem na área de saída como "enviada"
-        appendMessage(msg, 'outgoing')
-        textarea.value = ''
-        scrollToBottom()
+        appendMessage(msg, 'outgoing');
+        textarea.value = '';
+        scrollToBottom();
 
         // Envia ao servidor
-        socket.emit('message', msg)
+        socket.emit('message', msg);
     } else {
         alert('Por favor, selecione um usuário para conversar.');
     }
@@ -53,25 +53,34 @@ function sendMessage(message) {
 
 // Recebe a mensagem e mostra apenas a versão "incoming" (recebida)
 socket.on('message', (msg) => {
-    if (msg.user !== name && msg.room === room) { // Verifica se a mensagem é para a sala atual
+    if (msg.user !== name && msg.room === room) {
         appendMessage(msg, 'incoming');
     }
     scrollToBottom();
-})
+});
+
+// Carrega o histórico de mensagens ao entrar na sala
+socket.on('history', (messages) => {
+    messages.forEach(msg => {
+        const messageType = msg.user === name ? 'outgoing' : 'incoming';
+        appendMessage(msg, messageType);
+    });
+    scrollToBottom();
+});
 
 function appendMessage(msg, type) {
-    let mainDiv = document.createElement('div')
-    let className = type
-    mainDiv.classList.add(className, 'message')
+    let mainDiv = document.createElement('div');
+    let className = type;
+    mainDiv.classList.add(className, 'message');
 
     let markup = `
         <h4>${msg.user}</h4>
         <p>${msg.message}</p>
-    `
-    mainDiv.innerHTML = markup
-    messageArea.appendChild(mainDiv)
+    `;
+    mainDiv.innerHTML = markup;
+    messageArea.appendChild(mainDiv);
 }
 
 function scrollToBottom() {
-    messageArea.scrollTop = messageArea.scrollHeight
+    messageArea.scrollTop = messageArea.scrollHeight;
 }
