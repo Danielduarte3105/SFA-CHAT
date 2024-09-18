@@ -1,6 +1,6 @@
 const socket = io()
 let name;
-let room; // Variável para armazenar a sala atual
+let room = null; // Inicializa a variável room como null
 let textarea = document.querySelector('#textarea')
 let messageArea = document.querySelector('.message__area')
 let userList = document.querySelectorAll('.list-friends li');
@@ -13,15 +13,15 @@ do {
 // Adiciona evento de clique para cada usuário na lista
 userList.forEach(user => {
     user.addEventListener('click', () => {
-        let selectedUser = user.getAttribute('data-user');
-        room = selectedUser; // Define a sala como o nome do usuário clicado
-
-        // Entra na sala correspondente
-        socket.emit('joinRoom', room);
-        
-        // Limpa a área de mensagens
-        messageArea.innerHTML = '';
-        console.log(`Você entrou na sala de ${room}`);
+        let selectedUser = user.getAttribute('data-user'); // Captura o valor do atributo data-user
+        if (selectedUser) {
+            room = selectedUser; // Define a sala como o nome do usuário clicado
+            socket.emit('joinRoom', room); // Envia o nome da sala para o servidor
+            messageArea.innerHTML = ''; // Limpa a área de mensagens
+            console.log(`Você entrou na sala de ${room}`);
+        } else {
+            console.error('Usuário ou sala não encontrado.');
+        }
     });
 });
 
@@ -53,8 +53,7 @@ function sendMessage(message) {
 
 // Recebe a mensagem e mostra apenas a versão "incoming" (recebida)
 socket.on('message', (msg) => {
-    // Só exibe a mensagem recebida se for de outro usuário
-    if (msg.user !== name && msg.room === room) {
+    if (msg.user !== name && msg.room === room) { // Verifica se a mensagem é para a sala atual
         appendMessage(msg, 'incoming');
     }
     scrollToBottom();
