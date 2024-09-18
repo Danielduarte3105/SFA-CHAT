@@ -26,6 +26,28 @@ button {
   display: inline-block;
   font-size: 16px;
 }
+		
+.Conf {
+  background-color: #004b8d;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+		
+.Upa {
+  background-color: #577063;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
 
 body {
     display: flex;
