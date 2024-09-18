@@ -5,6 +5,13 @@ const http = require('http').createServer(app);
 
 const PORT = process.env.PORT || 3000;
 
+// Função para limpar o histórico de mensagens de uma sala
+function clearMessageHistory(room) {
+    fs.writeFileSync(`./history_${room}.json`, JSON.stringify([], null, 2));
+    console.log(`O histórico da sala ${room} foi limpo.`);
+}
+
+
 http.listen(PORT, () => {
     console.log(`Listening on port ${PORT}`);
 });
