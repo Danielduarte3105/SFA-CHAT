@@ -19,15 +19,8 @@ const io = require('socket.io')(http)
 
 io.on('connection', (socket) => {
     console.log('Connected...')
-
-    // Adicionar o usuário a uma sala com base no nome
-    socket.on('joinRoom', (room) => {
-        socket.join(room);
-        console.log(`User joined room: ${room}`);
-    });
-
     socket.on('message', (msg) => {
-        const room = msg.room; // A sala para a qual a mensagem será enviada
-        io.to(room).emit('message', msg);
+        socket.broadcast.emit('message', msg)
     })
+
 })
