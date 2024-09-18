@@ -84,3 +84,10 @@ function appendMessage(msg, type) {
 function scrollToBottom() {
     messageArea.scrollTop = messageArea.scrollHeight;
 }
+
+// Limpa o histórico de uma sala quando solicitado
+socket.on('clearHistory', (room) => {
+    clearMessageHistory(room);
+    io.to(room).emit('historyCleared'); // Informa os clientes que o histórico foi limpo
+});
+
