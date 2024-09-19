@@ -10,8 +10,8 @@ Construído usando Node.js & Socket.IO & React e Styled-Components.
 
 ### Área de Trabalho
 
-![Área de trabalho](![image](https://github.com/user-attachments/assets/bb17dd2f-5726-4d37-999c-d8b4e8cdb307)
-)
+![Área de trabalho](https://imgur.com/gallery/app-site-chat-dB6w0Ft)
+
 
 ### Móvel
 
