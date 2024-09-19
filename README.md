@@ -10,7 +10,7 @@ Construído usando Node.js & Socket.IO & React e Styled-Components.
 
 ### Área de Trabalho
 
-![Área de trabalho](https://imgur.com/a/dB6w0Ft)
+![Área de trabalho]((https://imgur.com/keFkjnL))
 
 ### Móvel
 
@@ -46,7 +46,7 @@ Built using Node.js & Socket.IO & React and Styled-Components.
 
 ### Desktop
 
-![Desktop](https://imgur.com/a/dB6w0Ft)
+![Desktop](https://imgur.com/keFkjnL)
 
 ### Mobile
 
