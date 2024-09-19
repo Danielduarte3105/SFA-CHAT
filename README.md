@@ -10,7 +10,8 @@ Construído usando Node.js & Socket.IO & React e Styled-Components.
 
 ### Área de Trabalho
 
-![Área de trabalho]((https://imgur.com/keFkjnL))
+![Área de trabalho](![image](https://github.com/user-attachments/assets/bb17dd2f-5726-4d37-999c-d8b4e8cdb307)
+)
 
 ### Móvel
 
@@ -46,7 +47,8 @@ Built using Node.js & Socket.IO & React and Styled-Components.
 
 ### Desktop
 
-![Desktop](https://imgur.com/keFkjnL)
+![Desktop](![image](https://github.com/user-attachments/assets/8713f3d7-bdc6-4d69-baca-1dd3b9d9b662)
+)
 
 ### Mobile
 
