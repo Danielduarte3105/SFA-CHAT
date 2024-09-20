@@ -59,28 +59,33 @@ socket.on('message', (msg) => {
     scrollToBottom();
 });
 
-// Carrega o histórico de mensagens ao entrar na sala
-socket.on('history', (messages) => {
-    messages.forEach(msg => {
-        const messageType = msg.user === name ? 'outgoing' : 'incoming';
-        appendMessage(msg, messageType);
-    });
-    scrollToBottom();
+// Upload de Arquivo
+document.getElementById('uploadFileBtn').addEventListener('click', () => {
+    document.getElementById('fileInput').click(); // Abre o seletor de arquivos
 });
 
-// Limpa o histórico da sala quando solicitado
-document.getElementById('clearHistoryBtn').addEventListener('click', () => {
-    if (room) {
-        socket.emit('clearHistory', room); // Solicita ao servidor para limpar o histórico da sala atual
-    } else {
-        alert('Por favor, selecione uma sala antes de limpar o histórico.');
+document.getElementById('fileInput').addEventListener('change', (event) => {
+    const file = event.target.files[0]; // Captura o arquivo selecionado
+    if (file) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        // Faz o upload do arquivo para o servidor
+        fetch('/upload', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.filePath) {
+                // Envia a URL do arquivo como uma mensagem para o servidor
+                sendMessage(`Arquivo enviado: <a href="${data.filePath}" target="_blank">${data.fileName}</a>`);
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao fazer upload do arquivo:', error);
+        });
     }
-});
-
-// Recebe a notificação de que o histórico foi limpo
-socket.on('historyCleared', () => {
-    messageArea.innerHTML = ''; // Limpa a área de mensagens na interface
-    alert('O histórico foi limpo.');
 });
 
 function appendMessage(msg, type) {
@@ -99,20 +104,3 @@ function appendMessage(msg, type) {
 function scrollToBottom() {
     messageArea.scrollTop = messageArea.scrollHeight;
 }
-
-document.getElementById('uploadFileBtn').addEventListener('click', () => {
-    document.getElementById('fileInput').click(); // Abre o seletor de arquivos
-});
-
-document.getElementById('fileInput').addEventListener('change', (event) => {
-    const file = event.target.files[0]; // Captura o arquivo selecionado
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            // Enviar o arquivo para o servidor ou processá-lo
-            console.log('Arquivo carregado:', file.name);
-            // Aqui você pode enviar o arquivo via Socket.io ou outro método
-        };
-        reader.readAsDataURL(file);
-    }
-});
