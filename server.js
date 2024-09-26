@@ -1,23 +1,9 @@
 const express = require('express');
-const fs = require('fs');
-const multer = require('multer'); // Adiciona multer para upload de arquivos
+const fs = require('fs'); // Para manipular arquivos
 const app = express();
 const http = require('http').createServer(app);
-const io = require('socket.io')(http);
 
 const PORT = process.env.PORT || 3000;
-
-// Configura o armazenamento para o multer
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/'); // Define a pasta para salvar os arquivos
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + '-' + file.originalname); // Nomeia o arquivo com a data atual para evitar duplicatas
-    }
-});
-
-const upload = multer({ storage: storage }); // Inicia o multer com a configuração de armazenamento
 
 http.listen(PORT, () => {
     console.log(`Listening on port ${PORT}`);
@@ -25,15 +11,12 @@ http.listen(PORT, () => {
 
 app.use(express.static(__dirname + '/public'));
 
-// Rota para upload de arquivos
-app.post('/upload', upload.single('file'), (req, res) => {
-    if (req.file) {
-        // Quando o arquivo é recebido com sucesso, envia uma resposta
-        res.json({ fileName: req.file.filename, filePath: `/uploads/${req.file.filename}` });
-    } else {
-        res.status(400).send('Erro ao enviar o arquivo');
-    }
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/index.html');
 });
+
+// Socket
+const io = require('socket.io')(http);
 
 // Carrega o histórico de mensagens de um arquivo JSON
 function loadMessageHistory(room) {
@@ -48,6 +31,12 @@ function loadMessageHistory(room) {
 // Salva o histórico de mensagens em um arquivo JSON
 function saveMessageHistory(room, messages) {
     fs.writeFileSync(`./history_${room}.json`, JSON.stringify(messages, null, 2));
+}
+
+// Função para limpar o histórico de mensagens de uma sala
+function clearMessageHistory(room) {
+    fs.writeFileSync(`./history_${room}.json`, JSON.stringify([], null, 2)); // Sobrescreve com um array vazio
+    console.log(`O histórico da sala ${room} foi limpo.`);
 }
 
 io.on('connection', (socket) => {
@@ -72,5 +61,11 @@ io.on('connection', (socket) => {
 
         // Envia a mensagem para todos na sala
         io.to(room).emit('message', msg);
+    });
+
+    // Limpa o histórico de uma sala quando solicitado
+    socket.on('clearHistory', (room) => {
+        clearMessageHistory(room);
+        io.to(room).emit('historyCleared'); // Informa os clientes que o histórico foi limpo
     });
 });
